@@ -338,10 +338,6 @@ class Serial(SerialBase, PlatformSpecific):
 
         custom_baud = None
 
-        vmin = vtime = 0                # timeout is done via select
-        if self._inter_byte_timeout is not None:
-            vmin = 1
-            vtime = int(self._inter_byte_timeout * 10)
         try:
             orig_attr = termios.tcgetattr(self.fd)
             iflag, oflag, cflag, lflag, ispeed, ospeed, cc = orig_attr
@@ -446,9 +442,12 @@ class Serial(SerialBase, PlatformSpecific):
 
         # buffer
         # vmin "minimal number of characters to be read. 0 for non blocking"
-        if vmin < 0 or vmin > 255:
-            raise ValueError('Invalid vmin: {!r}'.format(vmin))
-        cc[termios.VMIN] = vmin
+        if self._inter_byte_timeout is not None:
+            cc[termios.VMIN] = 1
+            vtime = int(self._inter_byte_timeout * 10)
+            if vtime < 0 or vtime > 255:
+               raise ValueError('Invalid vtime: {!r}'.format(vtime))
+            cc[termios.VTIME] = vtime
         # vtime
         if vtime < 0 or vtime > 255:
             raise ValueError('Invalid vtime: {!r}'.format(vtime))

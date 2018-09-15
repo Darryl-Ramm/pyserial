@@ -448,10 +448,6 @@ class Serial(SerialBase, PlatformSpecific):
             if vtime < 0 or vtime > 255:
                raise ValueError('Invalid vtime: {!r}'.format(vtime))
             cc[termios.VTIME] = vtime
-        # vtime
-        if vtime < 0 or vtime > 255:
-            raise ValueError('Invalid vtime: {!r}'.format(vtime))
-        cc[termios.VTIME] = vtime
         # activate settings
         if force_update or [iflag, oflag, cflag, lflag, ispeed, ospeed, cc] != orig_attr:
             termios.tcsetattr(
